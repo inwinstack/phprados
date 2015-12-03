@@ -20,6 +20,8 @@
 #define PHP_RADOS_OID_NAME_MAX_LENGTH 256
 #define PHP_RADOS_CLUSTER_RES_NAME "RADOS Cluster"
 #define PHP_RADOS_IOCTX_RES_NAME "RADOS IOCtx"
+//aio
+#define PHP_RADOS_COMPLETION_RES_NAME "RADOS Completion"
 
 typedef struct _php_rados_cluster {
     rados_t cluster;
@@ -29,6 +31,13 @@ typedef struct _php_rados_cluster {
 typedef struct _php_rados_ioctx {
     rados_ioctx_t io;
 } php_rados_ioctx;
+
+// aio
+typedef struct _php_rados_completion {
+    rados_completion_t comp;
+  int count;
+} php_rados_completion;
+/// End
 
 PHP_MINIT_FUNCTION(rados);
 PHP_MSHUTDOWN_FUNCTION(rados);
@@ -79,7 +88,15 @@ PHP_FUNCTION(rados_get_instance_id);
 PHP_FUNCTION(rados_ioctx_create2);
 PHP_FUNCTION(rados_ioctx_get_id);
 PHP_FUNCTION(rados_ioctx_get_pool_name);
-
+// aio
+PHP_FUNCTION(rados_aio_create_completion);
+PHP_FUNCTION(rados_aio_get_return_value);
+PHP_FUNCTION(rados_aio_wait_for_complete);
+PHP_FUNCTION(rados_aio_wait_for_safe);
+PHP_FUNCTION(rados_aio_release);
+PHP_FUNCTION(rados_aio_write_full);
+PHP_FUNCTION(rados_aio_append);
+/// End
 extern zend_module_entry rados_module_entry;
 #define phpext_rados_ptr &rados_module_entry;
 
