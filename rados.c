@@ -23,13 +23,13 @@ int le_rados_completion; // rados_completion_t
 ZEND_BEGIN_ARG_INFO_EX(arginfo_rados_create, 0, 0, 0)
     ZEND_ARG_INFO(0, id)
 ZEND_END_ARG_INFO()
-
+/*
 ZEND_BEGIN_ARG_INFO_EX(arginfo_rados_create2, 0, 0, 0)
     ZEND_ARG_INFO(0, clustername)
     ZEND_ARG_INFO(0, name)
     ZEND_ARG_INFO(0, flags)
 ZEND_END_ARG_INFO()
-
+*/
 ZEND_BEGIN_ARG_INFO(arginfo_rados_shutdown, 0)
     ZEND_ARG_INFO(0, cluster)
 ZEND_END_ARG_INFO()
@@ -58,12 +58,12 @@ ZEND_BEGIN_ARG_INFO(arginfo_rados_ioctx_create, 0)
     ZEND_ARG_INFO(0, cluster)
     ZEND_ARG_INFO(0, pool)
 ZEND_END_ARG_INFO()
-
+/*
 ZEND_BEGIN_ARG_INFO(arginfo_rados_ioctx_create2, 0)
     ZEND_ARG_INFO(0, cluster)
     ZEND_ARG_INFO(0, pool_id)
 ZEND_END_ARG_INFO()
-
+*/
 ZEND_BEGIN_ARG_INFO_EX(arginfo_rados_pool_list, 0, 0, 1)
     ZEND_ARG_INFO(0, cluster)
 ZEND_END_ARG_INFO()
@@ -288,14 +288,14 @@ ZEND_END_ARG_INFO()
 
 const zend_function_entry rados_functions[] = {
     PHP_FE(rados_create, arginfo_rados_create)
-    PHP_FE(rados_create2, arginfo_rados_create2)
+    //PHP_FE(rados_create2, arginfo_rados_create2)
     PHP_FE(rados_shutdown, arginfo_rados_shutdown)
     PHP_FE(rados_connect, arginfo_rados_connect)
     PHP_FE(rados_conf_read_file, arginfo_rados_conf_read_file)
     PHP_FE(rados_conf_set, arginfo_rados_conf_set)
     PHP_FE(rados_conf_get, arginfo_rados_conf_get)
     PHP_FE(rados_ioctx_create, arginfo_rados_ioctx_create)
-    PHP_FE(rados_ioctx_create2, arginfo_rados_ioctx_create2)
+    //PHP_FE(rados_ioctx_create2, arginfo_rados_ioctx_create2)
     PHP_FE(rados_ioctx_destroy, arginfo_rados_ioctx_destroy)
     PHP_FE(rados_pool_list, arginfo_rados_pool_list)
     PHP_FE(rados_pool_lookup, arginfo_rados_pool_lookup)
@@ -373,7 +373,7 @@ PHP_FUNCTION(rados_create)
     cluster_r->connected = false;
     ZEND_REGISTER_RESOURCE(return_value, cluster_r, le_rados_cluster);
 }
-
+/*
 PHP_FUNCTION(rados_create2)
 {
     php_rados_cluster *cluster_r;
@@ -397,7 +397,7 @@ PHP_FUNCTION(rados_create2)
     cluster_r->connected = false;
     ZEND_REGISTER_RESOURCE(return_value, cluster_r, le_rados_cluster);
 }
-
+*/
 PHP_FUNCTION(rados_shutdown)
 {
     php_rados_cluster *cluster_r;
@@ -1305,7 +1305,7 @@ PHP_FUNCTION(rados_get_instance_id) {
 
     RETURN_LONG(rados_get_instance_id(cluster_r->cluster));
 }
-
+/*
 PHP_FUNCTION(rados_ioctx_create2)
 {
     php_rados_cluster *cluster_r;
@@ -1330,7 +1330,7 @@ PHP_FUNCTION(rados_ioctx_create2)
     ioctx_r->io = io;
     ZEND_REGISTER_RESOURCE(return_value, ioctx_r, le_rados_ioctx);
 }
-
+*/
 PHP_FUNCTION(rados_ioctx_get_id) {
     php_rados_ioctx *ioctx_r;
     zval *zioctx;

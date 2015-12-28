@@ -44,7 +44,7 @@ PHP_MSHUTDOWN_FUNCTION(rados);
 PHP_MINFO_FUNCTION(rados);
 
 PHP_FUNCTION(rados_create);
-PHP_FUNCTION(rados_create2);
+//PHP_FUNCTION(rados_create2);
 PHP_FUNCTION(rados_shutdown);
 PHP_FUNCTION(rados_connect);
 PHP_FUNCTION(rados_conf_read_file);
@@ -85,7 +85,7 @@ PHP_FUNCTION(rados_cluster_fsid);
 PHP_FUNCTION(rados_wait_for_latest_osdmap);
 PHP_FUNCTION(rados_pool_reverse_lookup);
 PHP_FUNCTION(rados_get_instance_id);
-PHP_FUNCTION(rados_ioctx_create2);
+//PHP_FUNCTION(rados_ioctx_create2);
 PHP_FUNCTION(rados_ioctx_get_id);
 PHP_FUNCTION(rados_ioctx_get_pool_name);
 // aio
