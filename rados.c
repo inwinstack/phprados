@@ -18,17 +18,17 @@
 
 int le_rados_cluster;
 int le_rados_ioctx;
-
+int le_rados_completion; // rados_completion_t
 ZEND_BEGIN_ARG_INFO_EX(arginfo_rados_create, 0, 0, 0)
     ZEND_ARG_INFO(0, id)
 ZEND_END_ARG_INFO()
-
+/*
 ZEND_BEGIN_ARG_INFO_EX(arginfo_rados_create2, 0, 0, 0)
     ZEND_ARG_INFO(0, clustername)
     ZEND_ARG_INFO(0, name)
     ZEND_ARG_INFO(0, flags)
 ZEND_END_ARG_INFO()
-
+*/
 ZEND_BEGIN_ARG_INFO(arginfo_rados_shutdown, 0)
     ZEND_ARG_INFO(0, cluster)
 ZEND_END_ARG_INFO()
@@ -57,12 +57,12 @@ ZEND_BEGIN_ARG_INFO(arginfo_rados_ioctx_create, 0)
     ZEND_ARG_INFO(0, cluster)
     ZEND_ARG_INFO(0, pool)
 ZEND_END_ARG_INFO()
-
+/*
 ZEND_BEGIN_ARG_INFO(arginfo_rados_ioctx_create2, 0)
     ZEND_ARG_INFO(0, cluster)
     ZEND_ARG_INFO(0, pool_id)
 ZEND_END_ARG_INFO()
-
+*/
 ZEND_BEGIN_ARG_INFO_EX(arginfo_rados_pool_list, 0, 0, 1)
     ZEND_ARG_INFO(0, cluster)
 ZEND_END_ARG_INFO()
@@ -258,16 +258,52 @@ ZEND_BEGIN_ARG_INFO(arginfo_rados_ioctx_set_namespace, 0)
     ZEND_ARG_INFO(0, nspace)
 ZEND_END_ARG_INFO()
 
+//aio
+ZEND_BEGIN_ARG_INFO(arginfo_rados_aio_wait_for_complete, 0)
+    ZEND_ARG_INFO(0, completion)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO(arginfo_rados_aio_get_return_value, 0)
+    ZEND_ARG_INFO(0, completion)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO(arginfo_rados_aio_release, 0)
+    ZEND_ARG_INFO(0, completion)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO(arginfo_rados_aio_write_full, 0)
+    ZEND_ARG_INFO(0, ioctx)
+    ZEND_ARG_INFO(0, oid)
+    ZEND_ARG_INFO(0, completion)
+    ZEND_ARG_INFO(0, buffer)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO(arginfo_rados_aio_append, 0)
+    ZEND_ARG_INFO(0, ioctx)
+    ZEND_ARG_INFO(0, oid)
+    ZEND_ARG_INFO(0, completion)
+    ZEND_ARG_INFO(0, buffer)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_rados_aio_read, 0, 0, 4)
+    ZEND_ARG_INFO(0, ioctx)
+    ZEND_ARG_INFO(0, oid)
+    ZEND_ARG_INFO(0, completion)
+    ZEND_ARG_INFO(0, size)
+    ZEND_ARG_INFO(0, offset)
+ZEND_END_ARG_INFO()
+//end
+
 const zend_function_entry rados_functions[] = {
     PHP_FE(rados_create, arginfo_rados_create)
-    PHP_FE(rados_create2, arginfo_rados_create2)
+    //PHP_FE(rados_create2, arginfo_rados_create2)
     PHP_FE(rados_shutdown, arginfo_rados_shutdown)
     PHP_FE(rados_connect, arginfo_rados_connect)
     PHP_FE(rados_conf_read_file, arginfo_rados_conf_read_file)
     PHP_FE(rados_conf_set, arginfo_rados_conf_set)
     PHP_FE(rados_conf_get, arginfo_rados_conf_get)
     PHP_FE(rados_ioctx_create, arginfo_rados_ioctx_create)
-    PHP_FE(rados_ioctx_create2, arginfo_rados_ioctx_create2)
+    //PHP_FE(rados_ioctx_create2, arginfo_rados_ioctx_create2)
     PHP_FE(rados_ioctx_destroy, arginfo_rados_ioctx_destroy)
     PHP_FE(rados_pool_list, arginfo_rados_pool_list)
     PHP_FE(rados_pool_lookup, arginfo_rados_pool_lookup)
@@ -306,6 +342,12 @@ const zend_function_entry rados_functions[] = {
     PHP_FE(rados_ioctx_get_pool_name, arginfo_rados_ioctx_get_pool_name)
     PHP_FE(rados_ioctx_get_namespace, arginfo_rados_ioctx_get_namespace)
     PHP_FE(rados_ioctx_set_namespace, arginfo_rados_ioctx_set_namespace)
+    PHP_FE(rados_aio_create_completion, NULL)                // aio
+    PHP_FE(rados_aio_wait_for_complete, arginfo_rados_aio_wait_for_complete)     // aio
+    PHP_FE(rados_aio_get_return_value, arginfo_rados_aio_get_return_value)     // aio
+    PHP_FE(rados_aio_release, arginfo_rados_aio_release)     // aio
+    PHP_FE(rados_aio_write_full, arginfo_rados_aio_write_full)       // aio
+    PHP_FE(rados_aio_append, arginfo_rados_aio_append)       // aio
     {NULL, NULL, NULL}
 };
 
@@ -362,7 +404,7 @@ PHP_FUNCTION(rados_create)
     }
 
 }
-
+/*
 PHP_FUNCTION(rados_create2)
 {
     php_rados_cluster *cluster_r;
@@ -394,7 +436,7 @@ PHP_FUNCTION(rados_create2)
         ZEND_REGISTER_RESOURCE(return_value, cluster_r, le_rados_cluster);
     }
 }
-
+*/
 PHP_FUNCTION(rados_shutdown)
 {
     php_rados_cluster *cluster_r;
@@ -1597,7 +1639,7 @@ PHP_FUNCTION(rados_get_instance_id) {
 
     RETURN_LONG(rados_get_instance_id(cluster_r->cluster));
 }
-
+/*
 PHP_FUNCTION(rados_ioctx_create2)
 {
     php_rados_cluster *cluster_r;
@@ -1622,7 +1664,7 @@ PHP_FUNCTION(rados_ioctx_create2)
     ioctx_r->io = io;
     ZEND_REGISTER_RESOURCE(return_value, ioctx_r, le_rados_ioctx);
 }
-
+*/
 PHP_FUNCTION(rados_ioctx_get_id) {
     php_rados_ioctx *ioctx_r;
     zval *zioctx;
@@ -1700,6 +1742,159 @@ PHP_FUNCTION(rados_ioctx_set_namespace)
     } else {
         ioctx_r->nspace = NULL;
     }
+}
+//aio
+PHP_FUNCTION(rados_aio_create_completion) {
+    php_rados_completion *completion_r;
+    rados_completion_t comp;
+
+    /* if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss|l", &clustername, &clustername_len, &name, &name_len, &flags) == FAILURE) { */
+    /*     RETURN_NULL(); */
+    /* } */
+
+    if (rados_aio_create_completion(NULL, NULL, NULL, &comp) < 0) {
+        RETURN_FALSE;
+    }
+
+    completion_r = (php_rados_completion *)emalloc(sizeof(php_rados_completion));
+    completion_r->comp = comp;
+    completion_r->count = 3;
+
+    // speak out we are here
+    /* FILE *fp; */
+    /* fp = fopen("/tmp/complete.log", "w"); */
+    /* fclose(fp); */
+    /* php_printf("rados aio create completion.\n"); */
+    //
+    ZEND_REGISTER_RESOURCE(return_value, completion_r, le_rados_completion);
+}
+
+PHP_FUNCTION(rados_aio_get_return_value) {
+    php_rados_completion *completion_r;
+
+    zval *zcompletion;
+    int ret;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r", &zcompletion) == FAILURE) {
+        RETURN_FALSE;
+    }
+    ZEND_FETCH_RESOURCE(completion_r, php_rados_completion*, &zcompletion, -1, PHP_RADOS_COMPLETION_RES_NAME, le_rados_completion);
+
+    ret = rados_aio_get_return_value(completion_r->comp);
+
+    /* if (rados_aio_release(completion_r->comp) < 0) { */
+    /*     RETURN_FALSE; */
+    /* } */
+
+    // speak out we are here
+    /* FILE *fp; */
+    /* fp = fopen("/tmp/release.log", "w"); */
+    /* fclose(fp); */
+    /* php_printf("rados aio release completion.\n"); */
+    RETURN_LONG(ret);
+}
+
+PHP_FUNCTION(rados_aio_wait_for_complete) {
+    php_rados_completion *completion_r;
+
+    zval *zcompletion;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r", &zcompletion) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    ZEND_FETCH_RESOURCE(completion_r, php_rados_completion*, &zcompletion, -1, PHP_RADOS_COMPLETION_RES_NAME, le_rados_completion);
+
+    rados_aio_wait_for_complete(completion_r->comp);
+
+    /* if (rados_aio_release(completion_r->comp) < 0) { */
+    /*     RETURN_FALSE; */
+    /* } */
+    /* // speak out we are here */
+    /* php_printf("rados aio wait for complete.\n"); */
+
+    RETURN_TRUE;
+}
+
+PHP_FUNCTION(rados_aio_release) {
+    php_rados_completion *completion_r;
+
+    zval *zcompletion;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r", &zcompletion) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    ZEND_FETCH_RESOURCE(completion_r, php_rados_completion*, &zcompletion, -1, PHP_RADOS_COMPLETION_RES_NAME, le_rados_completion);
+
+    rados_aio_release(completion_r->comp);
+
+    /* if (rados_aio_release(completion_r->comp) < 0) { */
+    /*     RETURN_FALSE; */
+    /* } */
+
+    // speak out we are here
+    /* FILE *fp; */
+    /* fp = fopen("/tmp/release.log", "w"); */
+    /* fclose(fp); */
+    php_printf("count: %d\n", completion_r->count);
+    php_printf("rados aio release completion.\n");
+
+    // free memory
+    efree(completion_r);
+    zend_list_delete(Z_LVAL_P(zcompletion));
+    RETURN_TRUE;
+}
+
+PHP_FUNCTION(rados_aio_write_full) {
+    php_rados_ioctx *ioctx_r;
+    php_rados_completion *completion_r;
+
+    char *oid=NULL;
+    char *buffer=NULL;
+    int oid_len;
+    size_t buffer_len;
+
+    zval *zioctx;
+    zval *zcompletion;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rsrs", &zioctx, &oid, &oid_len, &zcompletion, &buffer, &buffer_len) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    ZEND_FETCH_RESOURCE(ioctx_r, php_rados_ioctx*, &zioctx, -1, PHP_RADOS_IOCTX_RES_NAME, le_rados_ioctx);
+    ZEND_FETCH_RESOURCE(completion_r, php_rados_completion*, &zcompletion, -1, PHP_RADOS_COMPLETION_RES_NAME, le_rados_completion);
+
+    if (rados_aio_write_full(ioctx_r->io, oid, completion_r->comp, buffer, buffer_len) < 0) {
+        RETURN_FALSE;
+    }
+
+    RETURN_TRUE;
+}
+
+PHP_FUNCTION(rados_aio_append) {
+    php_rados_ioctx *ioctx_r;
+    php_rados_completion *completion_r;
+
+    char *oid=NULL;
+    char *buffer=NULL;
+    int oid_len;
+    size_t buffer_len;
+    zval *zioctx;
+    zval *zcompletion;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rsrs", &zioctx, &oid, &oid_len, &zcompletion, &buffer, &buffer_len) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    ZEND_FETCH_RESOURCE(ioctx_r, php_rados_ioctx*, &zioctx, -1, PHP_RADOS_IOCTX_RES_NAME, le_rados_ioctx);
+    ZEND_FETCH_RESOURCE(completion_r, php_rados_completion*, &zcompletion, -1, PHP_RADOS_COMPLETION_RES_NAME, le_rados_completion);
+
+    if (rados_aio_append(ioctx_r->io, oid, completion_r->comp, buffer, buffer_len) < 0) {
+        RETURN_FALSE;
+    }
+
+    RETURN_TRUE;
 }
 
 PHP_MINIT_FUNCTION(rados)
