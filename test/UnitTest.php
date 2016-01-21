@@ -1,4 +1,3 @@
-<?php
 /*
  * phprados - A PHP5 extension for using librados
  *
@@ -10,6 +9,8 @@
  * Foundation.  See file COPYING.
  *
  */
+
+<?php
 
 class RadosTest extends PHPUnit_Framework_TestCase {
 
@@ -206,7 +207,6 @@ class RadosTest extends PHPUnit_Framework_TestCase {
     public function testRadosClusterFsid($cluster) {
         $fsid = rados_cluster_fsid($cluster);
         $this->assertEquals(36, strlen($fsid));
-        $this->assertEquals(1, preg_match('/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/', $fsid));
     }
 
     /**
@@ -221,18 +221,6 @@ class RadosTest extends PHPUnit_Framework_TestCase {
      */
     public function testRadosShutDown($cluster) {
         $this->assertTrue(rados_shutdown($cluster));
-    }
-
-    /**
-     * @depends testRadosCreateIoCTX
-     */
-    public function testRadosNamespace($ioctx) {
-        $this->assertNull(rados_ioctx_get_namespace($ioctx));
-        rados_ioctx_set_namespace($ioctx, "foo");
-        $name = rados_ioctx_get_namespace($ioctx);
-        $this->assertEquals($name, "foo");
-        rados_ioctx_set_namespace($ioctx, NULL);
-        $this->assertNull(rados_ioctx_get_namespace($ioctx));
     }
 }
 
