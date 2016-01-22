@@ -2,7 +2,7 @@
 #define PHP_RADOS_H
 
 #define PHP_RADOS_EXTNAME  "rados"
-#define PHP_RADOS_EXTVER   "0.9.4"
+#define PHP_RADOS_EXTVER   "0.9.3"
 
 #include "php.h"
 #include "php_ini.h"
@@ -29,7 +29,6 @@ typedef struct _php_rados_cluster {
 
 typedef struct _php_rados_ioctx {
     rados_ioctx_t io;
-    char *nspace;
 } php_rados_ioctx;
 
 //aio
@@ -88,8 +87,6 @@ PHP_FUNCTION(rados_get_instance_id);
 //PHP_FUNCTION(rados_ioctx_create2);
 PHP_FUNCTION(rados_ioctx_get_id);
 PHP_FUNCTION(rados_ioctx_get_pool_name);
-PHP_FUNCTION(rados_ioctx_get_namespace);
-PHP_FUNCTION(rados_ioctx_set_namespace);
 
 //aio
 PHP_FUNCTION(rados_aio_create_completion);
